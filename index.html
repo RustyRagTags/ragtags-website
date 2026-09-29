@@ -71,7 +71,7 @@
         <div><strong>AU/NZ RagTags</strong><small>Reputation • Monthly • Low-pop progression</small></div>
       </div>
       <nav class="links">
-        <a href="#server">Server</a><a href="#rep">Reputation</a><a href="#economy">Economy</a>
+        <a href="#server">Server</a><a href="#rep">Reputation</a><a href="#teams">Teams</a><a href="#economy">Economy</a>
         <a href="#bp">Blueprints</a><a href="#purge">Purge</a><a href="#faq">FAQ</a>
       </nav>
     </div>
@@ -80,7 +80,7 @@
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <span class="eyebrow">Official monthly wipes • Final-24h Purge • Earn your BP carryover</span>
+        <span class="eyebrow">Max 4 • No affiliate teaming • Final-24h Purge • Earn your BP carryover</span>
         <h1>Build. Progress. Keep it.</h1>
         <p class="lead">
           AU/NZ low-pop Rust for working people, dads and casual players. Peaceful play earns faster progression,
@@ -98,7 +98,8 @@
         <div class="stat"><span>Map wipe</span><strong>Official Rust monthly wipe</strong></div>
         <div class="stat"><span>Blueprint carryover</span><strong>71+ personal rep at Purge start</strong></div>
         <div class="stat"><span>Purge</span><strong>Final 24 hours before wipe</strong></div>
-        <div class="stat"><span>Team rep</span><strong>Lowest current member</strong></div>
+        <div class="stat"><span>Team size</span><strong>Maximum 4 players</strong></div>
+        <div class="stat"><span>Rule-group rep</span><strong>Lowest member across team + affiliates</strong></div>
       </aside>
     </div>
   </section>
@@ -121,7 +122,7 @@
         <ul class="clean">
           <li><strong>Days 1–7:</strong> hard offline raid protection after 10 minutes offline.</li>
           <li><strong>Day 8 onward:</strong> offline raiding enabled; reputation controls key advantages.</li>
-          <li><strong>Final 24h:</strong> Purge — all rep effects disabled and anything goes.</li>
+          <li><strong>Final 24h:</strong> Purge — combat/economy restrictions lift, but max-team and anti-affiliate rules still apply.</li>
           <li><strong>Wipe:</strong> map resets on Rust's official monthly force-wipe schedule.</li>
         </ul>
       </div>
@@ -133,7 +134,7 @@
       <div class="head">
         <div class="kicker">Reputation</div>
         <h2>Your actions affect the whole wipe.</h2>
-        <p>Team gameplay bonuses use the team's lowest current member. Blueprint carryover is different: that uses each player's own personal rep.</p>
+        <p>Gameplay bonuses use the lowest personal reputation across your current Rust team and any actively affiliated group. Blueprint carryover is different: that still uses each player's own personal rep.</p>
       </div>
       <div class="grid g4">
         <div class="panel card"><span class="tag">Offensive PvP</span><h3>Player kill</h3><div class="metric">-7</div><p>Only offensive kills are penalised. Valid self-defence is free.</p></div>
@@ -165,6 +166,68 @@
     </div>
   </section>
 
+  <section id="teams">
+    <div class="wrap">
+      <div class="head">
+        <div class="kicker">Teams & affiliate rules</div>
+        <h2>Maximum 4 players. Splitting into “farm” and “raid” teams does not bypass the limit.</h2>
+        <p>An affiliate is another player or team materially cooperating with you to operate as one larger group or to bypass reputation, protection, upkeep, raid or progression rules. Normal neighbours, ordinary one-off trades and simply being nearby do not make teams affiliates.</p>
+      </div>
+      <div class="grid g2">
+        <div class="panel card">
+          <span class="tag">Hard rule</span>
+          <h3>Maximum effective group size: 4</h3>
+          <ul class="clean">
+            <li>Rust team size is capped at <strong>4</strong>.</li>
+            <li>Separate teams may not coordinate as one larger team.</li>
+            <li>Rotating players between teams does not clear recent association.</li>
+            <li>Once teams are detected as affiliated, the server treats them as one rule group for reputation, protection, Wanted and ORP consequences.</li>
+            <li>If an affiliated rule group grows above 4, the server logs and warns the group as a team-limit violation.</li>
+          </ul>
+        </div>
+        <div class="panel card">
+          <span class="tag">Allowed</span>
+          <h3>What does NOT automatically make you affiliates?</h3>
+          <ul class="clean">
+            <li>Living near another team.</li>
+            <li>Choosing not to fight each other.</li>
+            <li>Normal vending-machine or shopfront purchases.</li>
+            <li>Ordinary one-off trades that do not meet raid-support thresholds.</li>
+            <li>General chat, social contact or occasional neighbourly help.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid g2" style="margin-top:20px">
+        <div class="panel card">
+          <h3>Automated affiliation signals</h3>
+          <table>
+            <tr><th>Behaviour</th><th>Signal</th></tr>
+            <tr><td>Shared Tool Cupboard authorization</td><td><strong>+8</strong> — immediate affiliate threshold</td></tr>
+            <tr><td>Co-raiding the same enemy base in the same raid session</td><td><strong>+8</strong> — immediate affiliate threshold</td></tr>
+            <tr><td>Were on the same Rust team within the recent memory window</td><td><strong>+5</strong></td></tr>
+            <tr><td>Defending another team's base during an active raid</td><td><strong>+4</strong></td></tr>
+            <tr><td>Repeated qualifying high-risk transfers</td><td><strong>+2</strong> bonus</td></tr>
+          </table>
+          <p class="muted">Affiliate threshold: <strong>8 points</strong>. Once linked, affiliation persists for <strong>48 hours after the last qualifying signal</strong>.</p>
+        </div>
+        <div class="panel card">
+          <h3>Raid-material / scrap transfer detection</h3>
+          <table>
+            <tr><th>24-hour transfer total between separate teams</th><th>Signal</th></tr>
+            <tr><td>1 C4 / 2+ C4</td><td>+5 / <strong>+8</strong></td></tr>
+            <tr><td>2 rockets / 4+ rockets</td><td>+5 / <strong>+8</strong></td></tr>
+            <tr><td>8 satchels / 12+ satchels</td><td>+4 / <strong>+8</strong></td></tr>
+            <tr><td>128 explosive ammo / 192+</td><td>+4 / <strong>+8</strong></td></tr>
+            <tr><td>1,000 / 2,000 / 4,000 gunpowder</td><td>+3 / +5 / <strong>+8</strong></td></tr>
+            <tr><td>2,000 / 4,000 / 8,000 sulfur</td><td>+3 / +5 / <strong>+8</strong></td></tr>
+            <tr><td>750 scrap in one transfer / 1,500 / 3,000 in 24h</td><td>+3 / +4 / <strong>+8</strong></td></tr>
+          </table>
+          <p class="muted">The detector tracks direct drops/pickups and transfers into another team's player-owned storage. Normal vending/shopfront transactions are excluded.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="economy">
     <div class="wrap">
       <div class="head">
@@ -175,15 +238,15 @@
       <div class="grid g3">
         <div class="panel card">
           <span class="tag">General gather</span>
-          <table><tr><th>Team rep</th><th>Rate</th></tr><tr><td>0–59</td><td>1×</td></tr><tr><td>60–89</td><td>2×</td></tr><tr><td>90–100</td><td>3×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
+          <table><tr><th>Rule-group rep</th><th>Rate</th></tr><tr><td>0–59</td><td>1×</td></tr><tr><td>60–89</td><td>2×</td></tr><tr><td>90–100</td><td>3×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
         </div>
         <div class="panel card">
           <span class="tag">Sulfur</span>
-          <table><tr><th>Team rep</th><th>Rate</th></tr><tr><td>0–49</td><td>0.5×</td></tr><tr><td>50–89</td><td>1×</td></tr><tr><td>90–100</td><td>2×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
+          <table><tr><th>Rule-group rep</th><th>Rate</th></tr><tr><td>0–49</td><td>0.5×</td></tr><tr><td>50–89</td><td>1×</td></tr><tr><td>90–100</td><td>2×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
         </div>
         <div class="panel card">
           <span class="tag">Base upkeep</span>
-          <table><tr><th>Team rep</th><th>Upkeep</th></tr><tr><td>0–20</td><td>1.5×</td></tr><tr><td>21–70</td><td>1×</td></tr><tr><td>71–100</td><td>0.5×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
+          <table><tr><th>Rule-group rep</th><th>Upkeep</th></tr><tr><td>0–20</td><td>1.5×</td></tr><tr><td>21–70</td><td>1×</td></tr><tr><td>71–100</td><td>0.5×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
         </div>
       </div>
     </div>
@@ -200,7 +263,7 @@
           <li>At the exact start of the automatic Purge, the server snapshots each player's <strong>personal reputation</strong>.</li>
           <li><strong>71+ personal rep:</strong> your learned personal BPs are secured for the next wipe.</li>
           <li><strong>70 or lower:</strong> your learned personal BPs are reset at map wipe.</li>
-          <li>Team reputation does <strong>not</strong> decide BP carryover.</li>
+          <li>Rule-group reputation does <strong>not</strong> decide BP carryover; BP carryover stays personal.</li>
           <li>What you do during Purge does not change the locked BP result.</li>
           <li>Use <strong>/bpstatus</strong> to check your current or locked carryover state.</li>
         </ul>
@@ -226,7 +289,7 @@
         <div class="pills">
           <span class="pill">1× general gather</span><span class="pill">1× sulfur</span><span class="pill">1× upkeep</span>
           <span class="pill">1× raid damage</span><span class="pill">No ORP</span><span class="pill">No rep penalties</span>
-          <span class="pill">BP carryover already locked</span>
+          <span class="pill">BP carryover already locked</span><span class="pill">Max 4 still applies</span><span class="pill">No affiliate teaming still applies</span>
         </div>
       </div>
     </div>
@@ -256,13 +319,13 @@
 
       <details open><summary>When does the server wipe?</summary><p>The map follows Rust's official monthly force-wipe schedule: the first Thursday of each month at 19:00 Europe/London.</p></details>
       <details><summary>When does Purge start?</summary><p>Purge starts automatically exactly 24 hours before the official monthly wipe.</p></details>
-      <details><summary>What changes during Purge?</summary><p>Anything goes. Gather, sulfur and upkeep return to 1×, raid damage returns to normal 1×, ORP is disabled and reputation penalties are suspended.</p></details>
+      <details><summary>What changes during Purge?</summary><p>Combat and raiding restrictions lift: gather, sulfur and upkeep return to 1×, raid damage returns to normal 1×, ORP is disabled and reputation penalties are suspended. The max-4 and no-affiliate-teaming rules still apply.</p></details>
       <details><summary>Does Purge affect my blueprint carryover?</summary><p>No. Your BP carryover is locked at the instant automatic Purge begins. What you do during Purge cannot change that result.</p></details>
       <details><summary>How do I keep my personal blueprints?</summary><p>Have at least 71 personal reputation when automatic Purge starts. At 71+, your learned personal BPs carry into the next wipe.</p></details>
       <details><summary>What happens if I have 70 reputation at Purge?</summary><p>You do not qualify for BP carryover. Your learned personal BPs will reset at the map wipe.</p></details>
       <details><summary>Does my team's lowest reputation decide my BP carryover?</summary><p>No. Gameplay bonuses use the team's lowest member, but BP carryover uses your own personal reputation.</p></details>
       <details><summary>How can I check whether my BPs are safe?</summary><p>Use <strong>/bpstatus</strong>. Before Purge it shows your current personal rep and pending status. After the snapshot it shows whether carryover is locked as eligible.</p></details>
-      <details><summary>How does team reputation work?</summary><p>The team uses the lowest current member's reputation for gather, sulfur, upkeep and reputation-based protection.</p></details>
+      <details><summary>How does rule-group reputation work?</summary><p>The server uses the lowest personal reputation across your current Rust team plus any active affiliated players/teams for gather, sulfur, upkeep, Wanted and reputation-based protection.</p></details>
       <details><summary>What reputation do new players start with?</summary><p>Players start at 60 reputation.</p></details>
       <details><summary>How do I gain reputation?</summary><p>You need at least 30 active peaceful minutes to qualify for a recovery award. Recovery does not happen passively while you are offline.</p></details>
       <details><summary>How fast does reputation recover?</summary><p>The current recovery curve is +5 / +4 / +3 / +2 / +1 depending on your reputation band, with one recovery cycle per 24 hours.</p></details>
@@ -283,12 +346,26 @@
       <details><summary>Can I just stay offline and recover reputation?</summary><p>No. There is no passive offline reputation regeneration. You need active peaceful play time.</p></details>
       <details><summary>Is this a 2× server?</summary><p>Not globally. Gather rates are reputation-based. A 60–89 team effectively gets 2× general gather, but lower and higher bands differ.</p></details>
       <details><summary>Why is sulfur separate from normal gather?</summary><p>Sulfur is deliberately more restricted so high reputation helps progression without making raiding resources scale too aggressively.</p></details>
+      <details><summary>What is the maximum team size?</summary><p>Four players. The in-game team limit is 4 and the anti-affiliate system also treats coordinated separate teams as one effective rule group.</p></details>
+      <details><summary>What is an affiliate?</summary><p>An affiliate is a player or team materially cooperating with another group in a way that lets them operate as one larger group or bypass team-size, reputation, protection, upkeep, raid or progression rules.</p></details>
+      <details><summary>Can we have one peaceful farming team and a separate raiding team?</summary><p>No. If the teams materially cooperate, share base access, co-raid or supply significant raid resources, they can be linked as affiliates and treated as one rule group.</p></details>
+      <details><summary>Can two separate teams share a Tool Cupboard?</summary><p>Shared TC authorization is a high-confidence affiliation signal and reaches the automatic affiliation threshold by itself.</p></details>
+      <details><summary>Can two teams raid the same target together?</summary><p>Co-raiding the same enemy base during the same raid session is treated as a high-confidence affiliation signal.</p></details>
+      <details><summary>Can I leave my team to raid, then rejoin?</summary><p>Leaving or switching teams does not instantly clear your association. Recent same-team history remains a signal and affiliation can persist for 48 hours after qualifying activity.</p></details>
+      <details><summary>Does trading make us affiliates?</summary><p>Ordinary trading does not automatically link teams. The detector specifically looks for substantial raid-support materials and large scrap transfers, plus repeated transfers and other cooperation signals.</p></details>
+      <details><summary>Are vending machine purchases counted as affiliate trades?</summary><p>No. Normal vending-machine and shopfront transactions are excluded from the storage-transfer detector.</p></details>
+      <details><summary>What raid materials are tracked?</summary><p>C4, rockets, satchels, explosive rifle ammo, gunpowder, sulfur/sulfur ore and large scrap transfers are tracked against published thresholds.</p></details>
+      <details><summary>How long does an affiliate link last?</summary><p>Once the affiliation threshold is reached, the link remains for 48 hours after the last qualifying signal.</p></details>
+      <details><summary>How can I see my affiliate group?</summary><p>Use <strong>/affiliates</strong>. Admins can use <strong>ragaff.status &lt;SteamID64&gt;</strong> to see the score and evidence behind a link.</p></details>
+      <details><summary>Can an admin remove a false affiliate link?</summary><p>Yes. Admins can inspect the evidence with <strong>ragaff.status</strong> or <strong>ragaff.score</strong>, then use <strong>ragaff.unaffiliate &lt;SteamID64-A&gt; &lt;SteamID64-B&gt;</strong>. This clears the current cross-team evidence and suppresses automatic re-linking for 24 hours by default. Admins can supply a different number of hours, or use <strong>ragaff.reaffiliate</strong> to remove the suppression early.</p></details>
+      <details><summary>Does the max-4 / no-affiliate rule disappear during Purge?</summary><p>No. Purge removes reputation, gather, upkeep, ORP and raid restrictions, but the maximum effective group size of 4 and anti-affiliate rule remain active.</p></details>
+      <details><summary>What happens if an affiliated group becomes larger than 4?</summary><p>The server logs the effective group and warns connected members that the group is over the limit. The affiliation remains active for rule calculations and the group is a server-rule violation.</p></details>
       <details><summary>What type of player is the server aimed at?</summary><p>Low-pop AU/NZ players who want monthly progression, especially working people, dads and casual teams who cannot be online constantly.</p></details>
     </div>
   </section>
 
   <footer>
-    <div class="wrap">AU/NZ RagTags — Reputation • Monthly • Official wipe timer • Final-24h Purge</div>
+    <div class="wrap">AU/NZ RagTags — Max 4 • No Affiliate Teaming • Reputation • Monthly • Final-24h Purge</div>
   </footer>
 
   <script>
