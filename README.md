@@ -1,20 +1,25 @@
-# RagTags Website
+# AU/NZ RagTags Website
 
-Static website for the AU/NZ RagTags Rust server.
+Static GitHub Pages site for the RagTags Rust server.
 
-## GitHub Pages setup
+## Current rules reflected in this build
 
-1. Upload the contents of this folder to the root of your repository.
-2. In GitHub, open **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**.
-4. Choose **main** and **/(root)**.
-5. Click **Save**.
+- RagTags Reputation v2.9.1
+- RagTags Raid Protection v1.3.0
+- Official Rust monthly wipe timer
+- Purge in the final 24 hours
+- BP carryover requires 71+ personal reputation at automatic Purge start
+- Dynamic gather, sulfur, upkeep and reputation-based protection
+- Week 1 hard ORP after 10 minutes offline
+- Gather Manager removed
 
-Your site will then publish at the GitHub Pages URL shown by GitHub.
+## Publish on GitHub Pages
 
-## Files
+1. Upload the contents of this ZIP into the root of your `ragtags-website` repo.
+2. Overwrite the existing `index.html`, `.nojekyll`, `README.md`, and `assets` files.
+3. In GitHub go to **Settings → Pages**.
+4. Use **Deploy from a branch**.
+5. Choose **main** and **/(root)**.
+6. Save.
 
-- `index.html` — main site
-- `assets/ragtags-header.png` — hero/header artwork
-- `assets/ragtags-icon.png` — server icon artwork
-- `.nojekyll` — tells GitHub Pages to serve the files directly
+GitHub Pages will redeploy automatically whenever you push updates to `main`.
