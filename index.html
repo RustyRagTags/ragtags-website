@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#140b08" />
+  <meta name="description" content="AU/NZ RagTags Rust server — Reputation, Monthly, Purge, BP carryover, dynamic upkeep and low-pop progression." />
+  <title>AU/NZ RagTags | Reputation | Monthly</title>
+  <style>
+    :root{
+      --bg:#120a07;--bg2:#1a0e0a;--panel:#21120d;--panel2:#2b1710;--text:#f8eee9;
+      --muted:#d3b8ac;--line:rgba(255,255,255,.08);--orange:#ff8a3d;--red:#ff4d2e;
+      --gold:#ffc36e;--green:#9bd27f;--shadow:0 22px 60px rgba(0,0,0,.38);--r:18px;--max:1180px
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);line-height:1.62;background:
+      radial-gradient(circle at 80% 0,rgba(255,99,42,.17),transparent 28%),
+      radial-gradient(circle at 0 90%,rgba(255,65,35,.10),transparent 25%),var(--bg)}
+    a{color:inherit;text-decoration:none} img{max-width:100%;display:block}
+    .wrap{width:min(calc(100% - 32px),var(--max));margin:0 auto}
+    .topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(18,10,7,.82);border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:13px 0}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand img{width:50px;height:50px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    .brand strong{display:block}.brand small{color:var(--muted)}
+    .links{display:flex;gap:18px;flex-wrap:wrap}.links a{font-size:.92rem;color:var(--muted)}.links a:hover{color:white}
+    .hero{position:relative;min-height:76vh;display:flex;align-items:center;border-bottom:1px solid var(--line);overflow:hidden}
+    .hero:before{content:"";position:absolute;inset:0;background:
+      linear-gradient(90deg,rgba(8,5,4,.91) 0%,rgba(8,5,4,.8) 45%,rgba(8,5,4,.54) 73%,rgba(8,5,4,.82) 100%),
+      linear-gradient(180deg,rgba(255,102,44,.13),rgba(0,0,0,.25)),
+      url('assets/ragtags-header.png') center/cover no-repeat;transform:scale(1.015)}
+    .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.25fr .75fr;gap:32px;align-items:center;padding:72px 0}
+    .eyebrow,.tag{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;font-size:.8rem;font-weight:800;letter-spacing:.03em}
+    .eyebrow{background:rgba(255,111,48,.13);border:1px solid rgba(255,111,48,.28);color:var(--gold)}
+    h1{font-size:clamp(2.5rem,5vw,4.8rem);line-height:1.02;letter-spacing:-.04em;margin:16px 0 16px;max-width:12ch}
+    .lead{color:var(--muted);max-width:65ch;font-size:1.06rem;margin:0}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+    .btn{padding:13px 17px;border-radius:14px;font-weight:800;border:1px solid transparent;cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,var(--orange),var(--red));box-shadow:0 12px 32px rgba(255,80,45,.24)}
+    .btn.secondary{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.11)}
+    .panel{background:linear-gradient(180deg,rgba(43,23,16,.94),rgba(30,16,12,.96));border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+    .hero-card{padding:20px}.hero-card img{border-radius:16px;border:1px solid rgba(255,255,255,.08);margin-bottom:16px}
+    .stat{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.065);font-size:.94rem;color:var(--muted)}
+    .stat:last-child{border-bottom:0}.stat strong{color:var(--text);text-align:right}
+    section{padding:76px 0}.head{margin-bottom:28px}.kicker{color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-size:.77rem;font-weight:900;margin-bottom:8px}
+    h2{font-size:clamp(1.8rem,3vw,2.8rem);line-height:1.08;margin:0 0 10px} h3{margin:0 0 9px}
+    .head p,.card p,.card li,.muted{color:var(--muted)} .head p{max-width:78ch;margin:0}
+    .grid{display:grid;gap:20px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .card{padding:22px}.tag{background:linear-gradient(135deg,#ffc26e,#ff8b47);color:#2a1407;margin-bottom:12px}
+    table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.02)}
+    th,td{padding:13px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top} th{color:#ffd8bd;background:rgba(255,109,47,.08)} tr:last-child td{border-bottom:0}
+    .metric{font-size:2rem;font-weight:900;margin:6px 0 8px}.clean{margin:0;padding-left:18px}
+    .connect{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-top:18px}
+    code{color:#ffd6bc;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.copy{border:0;border-radius:11px;padding:10px 13px;font-weight:800;background:linear-gradient(135deg,var(--orange),var(--red));color:white;cursor:pointer}
+    .purge{background:linear-gradient(135deg,rgba(255,78,41,.20),rgba(255,153,64,.08)),linear-gradient(180deg,rgba(43,23,16,.98),rgba(27,14,10,.98));border-color:rgba(255,98,45,.28)}
+    .pills{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.pill{padding:8px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.05);font-size:.85rem;font-weight:800;color:#ffe4d2}
+    details{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border-radius:15px;padding:17px 18px}
+    details+details{margin-top:12px}summary{cursor:pointer;font-weight:800}details p{color:var(--muted);margin:11px 0 0}
+    .notice{padding:18px;border-left:4px solid var(--orange);background:rgba(255,128,54,.08);border-radius:10px;color:#f2d5c5}
+    footer{padding:30px 0 48px;border-top:1px solid var(--line);color:var(--muted)}
+    @media(max-width:980px){.hero-grid,.g4,.g3,.g2{grid-template-columns:1fr}.links{display:none}}
+    @media(max-width:640px){h1{max-width:none}.hero{min-height:auto}.hero-grid{padding:48px 0}.connect{flex-direction:column;align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <div class="brand">
+        <img src="assets/ragtags-icon.png" alt="RagTags server icon">
+        <div><strong>AU/NZ RagTags</strong><small>Reputation • Monthly • Low-pop progression</small></div>
+      </div>
+      <nav class="links">
+        <a href="#server">Server</a><a href="#rep">Reputation</a><a href="#teams">Teams</a><a href="#economy">Economy</a>
+        <a href="#bp">Blueprints</a><a href="#purge">Purge</a><a href="#faq">FAQ</a><a href="https://discord.gg/AVs9FA5yb" target="_blank" rel="noopener">Discord</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Max 4 • No affiliate teaming • Final-24h Purge • Earn your BP carryover</span>
+        <h1>Build. Progress. Keep it.</h1>
+        <p class="lead">
+          AU/NZ low-pop Rust for working people, dads and casual players. Peaceful play earns faster progression,
+          cheaper upkeep and stronger protection. Aggression is allowed — it just has consequences.
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="#server">Server details</a>
+          <a class="btn secondary" href="https://discord.gg/AVs9FA5yb" target="_blank" rel="noopener">Join Discord</a>
+          <a class="btn secondary" href="#faq">Read the FAQ</a>
+        </div>
+      </div>
+      <aside class="panel hero-card">
+        <img src="assets/ragtags-icon.png" alt="RagTags artwork">
+        <div class="stat"><span>Server</span><strong>AU/NZ Ragtags | Reputation | Monthly</strong></div>
+        <div class="stat"><span>Address</span><strong>165.99.241.124:28080</strong></div>
+        <div class="stat"><span>Map wipe</span><strong>Official Rust monthly wipe</strong></div>
+        <div class="stat"><span>Blueprint carryover</span><strong>71+ personal rep at Purge start</strong></div>
+        <div class="stat"><span>Purge</span><strong>Final 24 hours before wipe</strong></div>
+        <div class="stat"><span>Team size</span><strong>Maximum 4 players</strong></div>
+        <div class="stat"><span>Rule-group rep</span><strong>Lowest member across team + affiliates</strong></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="server">
+    <div class="wrap grid g2">
+      <div class="panel card">
+        <div class="head">
+          <div class="kicker">Server info</div>
+          <h2>Designed around a full monthly progression loop.</h2>
+          <p>Week 1 protects casual players, the middle of wipe is reputation-driven, and the final 24 hours are full Purge.</p>
+        </div>
+        <div class="connect">
+          <code id="connect">client.connect 165.99.241.124:28080</code>
+          <button class="copy" onclick="copyConnect()">Copy</button>
+        </div>
+        <div class="connect">
+          <span><strong>Discord:</strong> Chat, updates, feedback &amp; LFG</span>
+          <a class="copy" href="https://discord.gg/AVs9FA5yb" target="_blank" rel="noopener" style="text-decoration:none">Join Discord</a>
+        </div>
+      </div>
+      <div class="panel card">
+        <span class="tag">Monthly flow</span>
+        <ul class="clean">
+          <li><strong>Days 1–7:</strong> hard offline raid protection after 10 minutes offline.</li>
+          <li><strong>Day 8 onward:</strong> offline raiding enabled; reputation controls key advantages.</li>
+          <li><strong>Final 24h:</strong> Purge — combat/economy restrictions lift, but max-team and anti-affiliate rules still apply.</li>
+          <li><strong>Wipe:</strong> map resets on Rust's official monthly force-wipe schedule.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="rep">
+    <div class="wrap">
+      <div class="head">
+        <div class="kicker">Reputation</div>
+        <h2>Your actions affect the whole wipe.</h2>
+        <p>Gameplay bonuses use the lowest personal reputation across your current Rust team and any actively affiliated group. Blueprint carryover is different: that still uses each player's own personal rep.</p>
+      </div>
+      <div class="grid g4">
+        <div class="panel card"><span class="tag">Offensive PvP</span><h3>Player kill</h3><div class="metric">-7</div><p>Only offensive kills are penalised. Valid self-defence is free.</p></div>
+        <div class="panel card"><span class="tag">Sleeping player</span><h3>Sleeper kill</h3><div class="metric">-10</div><p>Sleeper kills carry a larger reputation penalty.</p></div>
+        <div class="panel card"><span class="tag">Base raid</span><h3>Raid start</h3><div class="metric">-18</div><p>Applied once per normal raid session. Valid retaliation is reduced.</p></div>
+        <div class="panel card"><span class="tag">Base control</span><h3>TC destroyed</h3><div class="metric">-12</div><p>Destroying an enemy Tool Cupboard carries an extra hit.</p></div>
+      </div>
+      <div class="grid g2" style="margin-top:20px">
+        <div class="panel card">
+          <h3>Daily reputation recovery</h3>
+          <ul class="clean">
+            <li>Requires at least <strong>30 active peaceful minutes</strong>.</li>
+            <li>No passive offline regeneration.</li>
+            <li>One recovery cycle per 24 hours.</li>
+            <li>Recovery bands: <strong>+5 / +4 / +3 / +2 / +1</strong>.</li>
+          </ul>
+        </div>
+        <div class="panel card">
+          <h3>Self-defence & retaliation</h3>
+          <ul class="clean">
+            <li>Self-defence window: <strong>10 minutes</strong>.</li>
+            <li>Raid defence is penalty-free during the raid and for <strong>15 minutes</strong> after the last structure hit.</li>
+            <li>Retaliation window: <strong>24 hours</strong>.</li>
+            <li>Retaliation raid start: <strong>-5 rep</strong> instead of -18.</li>
+            <li>Raiders become <strong>Wanted for 6 hours</strong>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="teams">
+    <div class="wrap">
+      <div class="head">
+        <div class="kicker">Teams & affiliate rules</div>
+        <h2>Maximum 4 players. Splitting into “farm” and “raid” teams does not bypass the limit.</h2>
+        <p>An affiliate is another player or team materially cooperating with you to operate as one larger group or to bypass reputation, protection, upkeep, raid or progression rules. Normal neighbours, ordinary one-off trades and simply being nearby do not make teams affiliates.</p>
+      </div>
+      <div class="grid g2">
+        <div class="panel card">
+          <span class="tag">Hard rule</span>
+          <h3>Maximum effective group size: 4</h3>
+          <ul class="clean">
+            <li>Rust team size is capped at <strong>4</strong>.</li>
+            <li>Separate teams may not coordinate as one larger team.</li>
+            <li>Rotating players between teams does not clear recent association.</li>
+            <li>Once teams are detected as affiliated, the server treats them as one rule group for reputation, protection, Wanted and ORP consequences.</li>
+            <li>If an affiliated rule group grows above 4, the server logs and warns the group as a team-limit violation.</li>
+          </ul>
+        </div>
+        <div class="panel card">
+          <span class="tag">Allowed</span>
+          <h3>What does NOT automatically make you affiliates?</h3>
+          <ul class="clean">
+            <li>Living near another team.</li>
+            <li>Choosing not to fight each other.</li>
+            <li>Normal vending-machine or shopfront purchases.</li>
+            <li>Ordinary one-off trades that do not meet raid-support thresholds.</li>
+            <li>General chat, social contact or occasional neighbourly help.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid g2" style="margin-top:20px">
+        <div class="panel card">
+          <h3>Automated affiliation signals</h3>
+          <table>
+            <tr><th>Behaviour</th><th>Signal</th></tr>
+            <tr><td>Shared Tool Cupboard authorization</td><td><strong>+8</strong> — immediate affiliate threshold</td></tr>
+            <tr><td>Co-raiding the same enemy base in the same raid session</td><td><strong>+8</strong> — immediate affiliate threshold</td></tr>
+            <tr><td>Were on the same Rust team within the recent memory window</td><td><strong>+5</strong></td></tr>
+            <tr><td>Defending another team's base during an active raid</td><td><strong>+4</strong></td></tr>
+            <tr><td>Repeated qualifying high-risk transfers</td><td><strong>+2</strong> bonus</td></tr>
+          </table>
+          <p class="muted">Affiliate threshold: <strong>8 points</strong>. Once linked, affiliation persists for <strong>48 hours after the last qualifying signal</strong>.</p>
+        </div>
+        <div class="panel card">
+          <h3>Raid-material / scrap transfer detection</h3>
+          <table>
+            <tr><th>24-hour transfer total between separate teams</th><th>Signal</th></tr>
+            <tr><td>1 C4 / 2+ C4</td><td>+5 / <strong>+8</strong></td></tr>
+            <tr><td>2 rockets / 4+ rockets</td><td>+5 / <strong>+8</strong></td></tr>
+            <tr><td>8 satchels / 12+ satchels</td><td>+4 / <strong>+8</strong></td></tr>
+            <tr><td>128 explosive ammo / 192+</td><td>+4 / <strong>+8</strong></td></tr>
+            <tr><td>1,000 / 2,000 / 4,000 gunpowder</td><td>+3 / +5 / <strong>+8</strong></td></tr>
+            <tr><td>2,000 / 4,000 / 8,000 sulfur</td><td>+3 / +5 / <strong>+8</strong></td></tr>
+            <tr><td>750 scrap in one transfer / 1,500 / 3,000 in 24h</td><td>+3 / +4 / <strong>+8</strong></td></tr>
+          </table>
+          <p class="muted">The detector tracks direct drops/pickups and transfers into another team's player-owned storage. Normal vending/shopfront transactions are excluded.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="economy">
+    <div class="wrap">
+      <div class="head">
+        <div class="kicker">Gather, sulfur & upkeep</div>
+        <h2>Reputation changes how expensive the wipe feels.</h2>
+        <p>Gather, sulfur and upkeep all return to normal 1× values during Purge.</p>
+      </div>
+      <div class="grid g3">
+        <div class="panel card">
+          <span class="tag">General gather</span>
+          <table><tr><th>Rule-group rep</th><th>Rate</th></tr><tr><td>0–59</td><td>1×</td></tr><tr><td>60–89</td><td>2×</td></tr><tr><td>90–100</td><td>3×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
+        </div>
+        <div class="panel card">
+          <span class="tag">Sulfur</span>
+          <table><tr><th>Rule-group rep</th><th>Rate</th></tr><tr><td>0–49</td><td>0.5×</td></tr><tr><td>50–89</td><td>1×</td></tr><tr><td>90–100</td><td>2×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
+        </div>
+        <div class="panel card">
+          <span class="tag">Base upkeep</span>
+          <table><tr><th>Rule-group rep</th><th>Upkeep</th></tr><tr><td>0–20</td><td>1.5×</td></tr><tr><td>21–70</td><td>1×</td></tr><tr><td>71–100</td><td>0.5×</td></tr><tr><td>Purge</td><td>1×</td></tr></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="bp">
+    <div class="wrap grid g2">
+      <div class="panel card">
+        <div class="head">
+          <div class="kicker">Blueprint carryover</div>
+          <h2>Keep 71+ personal rep by Purge and keep your BPs.</h2>
+        </div>
+        <ul class="clean">
+          <li>At the exact start of the automatic Purge, the server snapshots each player's <strong>personal reputation</strong>.</li>
+          <li><strong>71+ personal rep:</strong> your learned personal BPs are secured for the next wipe.</li>
+          <li><strong>70 or lower:</strong> your learned personal BPs are reset at map wipe.</li>
+          <li>Rule-group reputation does <strong>not</strong> decide BP carryover; BP carryover stays personal.</li>
+          <li>What you do during Purge does not change the locked BP result.</li>
+          <li>Use <strong>/bpstatus</strong> to check your current or locked carryover state.</li>
+        </ul>
+      </div>
+      <div class="panel card">
+        <span class="tag">Important</span>
+        <div class="notice">
+          The BP snapshot only happens at the real, automatic Purge start. Manually forcing Purge for testing does not lock blueprint carryover.
+        </div>
+        <p style="margin-top:16px">The plugin also has a fail-safe: if the real snapshot is missing, it skips the BP wipe rather than wiping everyone by mistake.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="purge">
+    <div class="wrap">
+      <div class="panel card purge">
+        <div class="head" style="margin-bottom:12px">
+          <div class="kicker">Final 24 hours</div>
+          <h2>🔥 Purge — anything goes.</h2>
+          <p>Purge automatically begins 24 hours before Rust's official monthly wipe timer.</p>
+        </div>
+        <div class="pills">
+          <span class="pill">1× general gather</span><span class="pill">1× sulfur</span><span class="pill">1× upkeep</span>
+          <span class="pill">1× raid damage</span><span class="pill">No ORP</span><span class="pill">No rep penalties</span>
+          <span class="pill">BP carryover already locked</span><span class="pill">Max 4 still applies</span><span class="pill">No affiliate teaming still applies</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="head">
+        <div class="kicker">Raid protection</div>
+        <h2>Protection changes through the wipe.</h2>
+      </div>
+      <div class="grid g3">
+        <div class="panel card"><span class="tag">Days 1–7</span><h3>Hard ORP</h3><p>After the whole team has been offline for 10 minutes, the base is hard protected. Raiders also lose their own ORP eligibility for 6 hours.</p></div>
+        <div class="panel card"><span class="tag">Day 8 onward</span><h3>Reputation phase</h3><p>Hard ORP ends. Reputation-based online/offline damage scaling takes over, so good rep gives stronger protection and bad rep gives weaker protection.</p></div>
+        <div class="panel card"><span class="tag">Purge</span><h3>No protection</h3><p>ORP is disabled and all reputation defence modifiers return to normal 1× values for the final 24 hours.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="head">
+        <div class="kicker">FAQ</div>
+        <h2>Frequently asked questions</h2>
+        <p>These answers reflect the current live ruleset and plugin setup.</p>
+      </div>
+
+      <details open><summary>When does the server wipe?</summary><p>The map follows Rust's official monthly force-wipe schedule: the first Thursday of each month at 19:00 Europe/London.</p></details>
+      <details><summary>When does Purge start?</summary><p>Purge starts automatically exactly 24 hours before the official monthly wipe.</p></details>
+      <details><summary>What changes during Purge?</summary><p>Combat and raiding restrictions lift: gather, sulfur and upkeep return to 1×, raid damage returns to normal 1×, ORP is disabled and reputation penalties are suspended. The max-4 and no-affiliate-teaming rules still apply.</p></details>
+      <details><summary>Does Purge affect my blueprint carryover?</summary><p>No. Your BP carryover is locked at the instant automatic Purge begins. What you do during Purge cannot change that result.</p></details>
+      <details><summary>How do I keep my personal blueprints?</summary><p>Have at least 71 personal reputation when automatic Purge starts. At 71+, your learned personal BPs carry into the next wipe.</p></details>
+      <details><summary>What happens if I have 70 reputation at Purge?</summary><p>You do not qualify for BP carryover. Your learned personal BPs will reset at the map wipe.</p></details>
+      <details><summary>Does my team's lowest reputation decide my BP carryover?</summary><p>No. Gameplay bonuses use the team's lowest member, but BP carryover uses your own personal reputation.</p></details>
+      <details><summary>How can I check whether my BPs are safe?</summary><p>Use <strong>/bpstatus</strong>. Before Purge it shows your current personal rep and pending status. After the snapshot it shows whether carryover is locked as eligible.</p></details>
+      <details><summary>How does rule-group reputation work?</summary><p>The server uses the lowest personal reputation across your current Rust team plus any active affiliated players/teams for gather, sulfur, upkeep, Wanted and reputation-based protection.</p></details>
+      <details><summary>What reputation do new players start with?</summary><p>Players start at 60 reputation.</p></details>
+      <details><summary>How do I gain reputation?</summary><p>You need at least 30 active peaceful minutes to qualify for a recovery award. Recovery does not happen passively while you are offline.</p></details>
+      <details><summary>How fast does reputation recover?</summary><p>The current recovery curve is +5 / +4 / +3 / +2 / +1 depending on your reputation band, with one recovery cycle per 24 hours.</p></details>
+      <details><summary>What happens if I kill another player?</summary><p>An offensive player kill costs 7 reputation. Valid self-defence does not cost reputation.</p></details>
+      <details><summary>What happens if I kill a sleeper?</summary><p>A sleeper kill costs 10 reputation unless the target is covered by a specific exception such as Wanted handling.</p></details>
+      <details><summary>How does self-defence work?</summary><p>If the other side initiates hostile PvP, you get a 10-minute self-defence window against that team. Defensive kills within that context cost 0 reputation.</p></details>
+      <details><summary>Can I defend my base during a raid?</summary><p>Yes. Raid defence is penalty-free during the active raid and remains protected for 15 minutes after the last hostile structure hit.</p></details>
+      <details><summary>Can I retaliate after being raided?</summary><p>Yes. You get a 24-hour retaliation window against the original aggressor's team. A valid retaliation raid costs 5 reputation instead of the normal 18.</p></details>
+      <details><summary>How long does Wanted last?</summary><p>Raiders become Wanted for 6 hours. Wanted also reduces their effective gathering benefits.</p></details>
+      <details><summary>How does Week 1 offline protection work?</summary><p>For the first 7 days of the wipe, a base becomes hard protected after the team has been offline for 10 minutes.</p></details>
+      <details><summary>What happens after Day 7?</summary><p>Hard offline protection ends. Offline raiding is enabled and reputation-based damage protection becomes the relevant defence system.</p></details>
+      <details><summary>What are the general gather rates?</summary><p>0–59 rep = 1×, 60–89 = 2×, 90–100 = 3×. Purge = 1×.</p></details>
+      <details><summary>What are the sulfur rates?</summary><p>0–49 rep = 0.5×, 50–89 = 1×, 90–100 = 2×. Purge = 1×.</p></details>
+      <details><summary>How does upkeep work?</summary><p>0–20 team rep = 1.5× upkeep, 21–70 = 1×, 71–100 = 0.5×. Purge returns upkeep to 1×.</p></details>
+      <details><summary>Does Gather Manager still run on the server?</summary><p>No. Gather Manager was removed so it cannot stack multipliers on top of the RagTags reputation system.</p></details>
+      <details><summary>Do blueprints share between teammates?</summary><p>Blueprint Share is installed. Team blueprint sharing is enabled according to the server's configured Blueprint Share rules.</p></details>
+      <details><summary>What happens to reputation at map wipe?</summary><p>Reputation resets to the configured starting value of 60 when the new map wipe begins.</p></details>
+      <details><summary>Can I just stay offline and recover reputation?</summary><p>No. There is no passive offline reputation regeneration. You need active peaceful play time.</p></details>
+      <details><summary>Is this a 2× server?</summary><p>Not globally. Gather rates are reputation-based. A 60–89 team effectively gets 2× general gather, but lower and higher bands differ.</p></details>
+      <details><summary>Why is sulfur separate from normal gather?</summary><p>Sulfur is deliberately more restricted so high reputation helps progression without making raiding resources scale too aggressively.</p></details>
+      <details><summary>What is the maximum team size?</summary><p>Four players. The in-game team limit is 4 and the anti-affiliate system also treats coordinated separate teams as one effective rule group.</p></details>
+      <details><summary>What is an affiliate?</summary><p>An affiliate is a player or team materially cooperating with another group in a way that lets them operate as one larger group or bypass team-size, reputation, protection, upkeep, raid or progression rules.</p></details>
+      <details><summary>Can we have one peaceful farming team and a separate raiding team?</summary><p>No. If the teams materially cooperate, share base access, co-raid or supply significant raid resources, they can be linked as affiliates and treated as one rule group.</p></details>
+      <details><summary>Can two separate teams share a Tool Cupboard?</summary><p>Shared TC authorization is a high-confidence affiliation signal and reaches the automatic affiliation threshold by itself.</p></details>
+      <details><summary>Can two teams raid the same target together?</summary><p>Co-raiding the same enemy base during the same raid session is treated as a high-confidence affiliation signal.</p></details>
+      <details><summary>Can I leave my team to raid, then rejoin?</summary><p>Leaving or switching teams does not instantly clear your association. Recent same-team history remains a signal and affiliation can persist for 48 hours after qualifying activity.</p></details>
+      <details><summary>Does trading make us affiliates?</summary><p>Ordinary trading does not automatically link teams. The detector specifically looks for substantial raid-support materials and large scrap transfers, plus repeated transfers and other cooperation signals.</p></details>
+      <details><summary>Are vending machine purchases counted as affiliate trades?</summary><p>No. Normal vending-machine and shopfront transactions are excluded from the storage-transfer detector.</p></details>
+      <details><summary>What raid materials are tracked?</summary><p>C4, rockets, satchels, explosive rifle ammo, gunpowder, sulfur/sulfur ore and large scrap transfers are tracked against published thresholds.</p></details>
+      <details><summary>How long does an affiliate link last?</summary><p>Once the affiliation threshold is reached, the link remains for 48 hours after the last qualifying signal.</p></details>
+      <details><summary>How can I see my affiliate group?</summary><p>Use <strong>/affiliates</strong>. Admins can use <strong>ragaff.status &lt;SteamID64&gt;</strong> to see the score and evidence behind a link.</p></details>
+      <details><summary>Can an admin remove a false affiliate link?</summary><p>Yes. Admins can inspect the evidence with <strong>ragaff.status</strong> or <strong>ragaff.score</strong>, then use <strong>ragaff.unaffiliate &lt;SteamID64-A&gt; &lt;SteamID64-B&gt;</strong>. This clears the current cross-team evidence and suppresses automatic re-linking for 24 hours by default. Admins can supply a different number of hours, or use <strong>ragaff.reaffiliate</strong> to remove the suppression early.</p></details>
+      <details><summary>Does the max-4 / no-affiliate rule disappear during Purge?</summary><p>No. Purge removes reputation, gather, upkeep, ORP and raid restrictions, but the maximum effective group size of 4 and anti-affiliate rule remain active.</p></details>
+      <details><summary>What happens if an affiliated group becomes larger than 4?</summary><p>The server logs the effective group and warns connected members that the group is over the limit. The affiliation remains active for rule calculations and the group is a server-rule violation.</p></details>
+      <details><summary>What type of player is the server aimed at?</summary><p>Low-pop AU/NZ players who want monthly progression, especially working people, dads and casual teams who cannot be online constantly.</p></details>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">AU/NZ RagTags — Max 4 • No Affiliate Teaming • Reputation • Monthly • Final-24h Purge</div>
+  </footer>
+
+  <script>
+    function copyConnect(){
+      const value=document.getElementById('connect').textContent;
+      navigator.clipboard.writeText(value).then(()=>{
+        const b=document.querySelector('.copy'),old=b.textContent;b.textContent='Copied';setTimeout(()=>b.textContent=old,1300)
+      })
+    }
+  </script>
+</body>
+</html>
